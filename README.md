@@ -20,54 +20,43 @@ A simple product management application built with Next.js 15 (App Router) and N
 npm install
 ```
 
-### 2. Environment Variables
+### 2. Google OAuth Setup
 
-Create a `.env.local` file in the root directory and add the following variables:
+This app uses **NextAuth.js** with Google OAuth for authentication.
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. **Enable Google+ API**
+4. Go to **Credentials** → **Create OAuth 2.0 Client ID**
+5. Set **Authorized redirect URIs**:
+   - For local development: `http://localhost:3000/api/auth/callback/google`
+   - For production: `https://your-netlify-site.netlify.app/api/auth/callback/google`
+6. Copy the **Client ID** and **Client Secret**
+
+### 3. Environment Variables
+
+Create a `.env.local` file in the root directory:
 
 ```env
 # NextAuth Configuration
 NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-secret-key-here-generate-a-random-string
+NEXTAUTH_SECRET=your-random-secret-key-here
 
 # Google OAuth Configuration
-GOOGLE_CLIENT_ID=your-google-client-id-here
-GOOGLE_CLIENT_SECRET=your-google-client-secret-here
-
-# Firebase Configuration (For Authentication)
-NEXT_PUBLIC_FIREBASE_API_KEY=your-firebase-api-key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
 ```
 
-### 3. Google OAuth Setup
+### 4. For Production (Netlify)
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Create a new project or select an existing one
-3. Enable the Google+ API
-4. Go to "Credentials" and create an OAuth 2.0 Client ID
-5. Set authorized redirect URIs to: `http://localhost:3000/api/auth/callback/google`
-6. Copy the Client ID and Client Secret to your `.env.local` file
+Update your `.env.local` with production values:
 
-### 4. Firebase Setup (For Authentication)
-
-To use Firebase Authentication alongside NextAuth.js:
-
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Create a new project or select an existing one
-3. Enable Authentication service
-4. Go to Project Settings > General > Your apps
-5. Add a web app and copy the configuration values
-6. Update your `.env.local` file with the Firebase config values
-
-**Required Firebase Configuration:**
-- **API Key**: Found in Project Settings > General > Your apps
-- **Auth Domain**: `your-project.firebaseapp.com`
-- **Project ID**: Your Firebase project ID
-
-**Optional Firebase Services:**
-- **Firestore**: Enable for database functionality (not included in this setup)
-- **Storage**: Enable for file storage (not included in this setup)
-- **Analytics**: Enable for user analytics (not included in this setup)
+```env
+NEXTAUTH_URL=https://your-netlify-site.netlify.app
+NEXTAUTH_SECRET=your-random-secret-key-here
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+```
 
 ### 4. Run the Development Server
 
@@ -121,48 +110,74 @@ src/
 - `PUT /api/products/[id]` - Update a product (requires authentication)
 - `DELETE /api/products/[id]` - Delete a product (requires authentication)
 
-## Firebase Authentication
+## NextAuth.js Authentication
 
-This app uses Firebase Authentication alongside NextAuth.js to provide additional authentication options:
+This app uses **NextAuth.js** as the primary authentication system with Google OAuth.
 
 ### **Authentication Flow**
-- **Primary**: NextAuth.js with Google OAuth (configured and working)
-- **Secondary**: Firebase Auth (available for additional auth methods)
-- **Hybrid Approach**: You can use both or choose one
+- **Primary**: NextAuth.js with Google OAuth
+- **Session Management**: Secure JWT-based sessions
+- **Protected Routes**: Automatic route protection
 
 ### **Available Auth Methods**
-- **Google OAuth** (via NextAuth.js) - Currently active
-- **Email/Password** (via Firebase Auth) - Ready to implement
-- **Phone Authentication** (via Firebase Auth) - Ready to implement
-- **Social Logins** (via Firebase Auth) - Ready to implement
+- ✅ **Google OAuth** (via NextAuth.js) - Currently active
+- 🔄 **Email/Password** (via NextAuth.js) - Can be added
+- 🔄 **Social Logins** (via NextAuth.js) - Can be added
 
-### **Using Firebase Auth**
-The Firebase authentication helpers are available in `src/lib/firebaseAuth.js`:
+### **NextAuth.js Configuration**
+The authentication is configured in `src/lib/auth.js` and `src/app/api/auth/[...nextauth]/route.js`.
 
-```javascript
-import { signInWithGoogle, signOutFirebase, onAuthStateChange } from '../lib/firebaseAuth';
+**Key Features:**
+- JWT-based sessions
+- Secure cookie management
+- CSRF protection
+- Automatic session refresh
 
-// Sign in with Google using Firebase
-await signInWithGoogle();
-
-// Sign out
-await signOutFirebase();
-
-// Listen to auth state changes
-onAuthStateChange((user) => {
-  console.log('User:', user);
-});
-```
-
-**Note:** Currently using NextAuth.js for authentication. Firebase Auth is configured for future use if needed.
+**Note:** NextAuth.js is the active authentication system with Google OAuth.
 
 ## Technologies Used
 
 - **Next.js 15** (App Router)
 - **NextAuth.js** for authentication
 - **TailwindCSS** for styling
-- **Google OAuth** for authentication
-- **Firebase** for additional authentication options
+- **Google OAuth** for sign-in
+- **Mock Data** for product management
+- **Route Handlers** (/api) for backend
+
+## Deployment to Netlify
+
+### **Quick Deploy Steps:**
+1. **Connect Repository** - Link your GitHub/GitLab repo to Netlify
+2. **Set Build Settings:**
+   - **Build command:** `npm run build`
+   - **Publish directory:** `.next`
+3. **Add Environment Variables:**
+   ```
+   NEXTAUTH_URL=https://your-netlify-site.netlify.app
+   NEXTAUTH_SECRET=your-random-secret-key-here
+   GOOGLE_CLIENT_ID=your-google-client-id
+   GOOGLE_CLIENT_SECRET=your-google-client-secret
+   ```
+4. **Deploy** - Netlify will build and deploy automatically
+
+### **Google OAuth for Production:**
+Before deploying, update your Google OAuth settings:
+1. Go to **Google Cloud Console** → **Credentials**
+2. Edit your OAuth 2.0 Client ID
+3. Add your Netlify domain to **Authorized redirect URIs**:
+   - `https://your-site-name.netlify.app/api/auth/callback/google`
+
+### **Manual Deploy:**
+```bash
+# Install Netlify CLI
+npm install -g netlify-cli
+
+# Login to Netlify
+netlify login
+
+# Deploy
+netlify deploy --prod --dir=.next
+```
 
 ## Learn More
 
@@ -170,3 +185,4 @@ onAuthStateChange((user) => {
 - [NextAuth.js Documentation](https://next-auth.js.org/)
 - [TailwindCSS Documentation](https://tailwindcss.com/docs)
 - [Firebase Documentation](https://firebase.google.com/docs)
+- [Netlify Deployment Guide](https://docs.netlify.com/get-started/)

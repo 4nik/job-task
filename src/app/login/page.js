@@ -32,7 +32,7 @@ export default function Login() {
     }
 
     if (session) {
-        return null;
+        return null; // Will redirect via useEffect
     }
 
     return (
@@ -73,7 +73,7 @@ export default function Login() {
                                     <div className="w-full border-t border-gray-300" />
                                 </div>
                                 <div className="relative flex justify-center text-sm">
-                                    <span className="px-2 bg-gray-50 text-gray-500">Secure authentication</span>
+                                    <span className="px-2 bg-gray-50 text-gray-500">Firebase Authentication</span>
                                 </div>
                             </div>
                         </div>
