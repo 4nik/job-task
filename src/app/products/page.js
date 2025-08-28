@@ -113,7 +113,7 @@ export default function Products() {
 
                     {filteredProducts.length === 0 && searchTerm && (
                         <div className="text-center mt-12">
-                            <p className="text-gray-500 text-lg">No products found matching &ldquo;{searchTerm}&rdquo;</p>
+                            <p className="text-gray-500 text-lg">{`No products found matching "${searchTerm}"`}</p>
                             <button
                                 onClick={() => setSearchTerm("")}
                                 className="mt-4 text-blue-600 hover:text-blue-500"
