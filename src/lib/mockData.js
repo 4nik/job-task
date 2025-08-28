@@ -56,7 +56,6 @@ export const products = [
   },
 ];
 
-
 let productList = [...products];
 
 export const getProducts = () => {
